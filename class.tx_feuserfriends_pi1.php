@@ -36,13 +36,21 @@ require_once(PATH_tslib.'class.tslib_pibase.php');
  * @package	TYPO3
  * @subpackage	tx_feuserfriends
  */
-class tx_feuserfriends_pi1 extends tslib_pibase {
+class tx_feuserfriends_pi1 extends tslib_pibase
+{
 	var $prefixId      = 'tx_feuserfriends_pi1';		// Same as class name
 	var $scriptRelPath = 'pi1/class.tx_feuserfriends_pi1.php';	// Path to this script relative to the extension dir.
 	var $extKey        = 'feuser_friends';	// The extension key.
 	var $pi_checkCHash = true;
 	var $detailId      = null;
 	var $templateFile  = null;
+	var $templateFileJS = null;
+	var $templatePart = null;
+	var $contentKey = null;
+	var $jsFiles = array();
+	var $js = array();
+	var $cssFiles = array();
+	var $css = array();
 	var $feuserId      = null;
 	var $friends_array = null;
 
@@ -123,6 +131,8 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 			}
 		}
 		$this->pi_addJS();
+		$this->addCssFile($this->conf['jQueryUIstyle']);
+		$this->addResources();
 
 		return $this->pi_wrapInBaseClass($content);
 	}
@@ -228,19 +238,19 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 				return $this->friends_array;
 			}
 			$query = "
-			SELECT DISTINCT IF(user_from={$this->feuserId}, user_to, user_from) AS friend
+			SELECT DISTINCT IF(user_from='{$this->feuserId}', user_to, user_from) AS friend
 			FROM tx_feuserfriends_friends
 			WHERE
 			(
-				user_from={$this->feuserId} OR
-				user_to={$this->feuserId}
+				user_from='{$this->feuserId}' OR
+				user_to='{$this->feuserId}'
 			)
 			AND
 			(
 				accept=1 OR
 				(
 					accept=0 AND
-					user_from={$this->feuserId}
+					user_from='{$this->feuserId}'
 				)
 			)
 			AND deleted=0
@@ -287,7 +297,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 		if (is_numeric($uID)) {
 			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				'tx_feuserfriends_friends',
-				"uid={$uID} AND user_to={$this->feuserId}",
+				"uid={$uID} AND user_to='{$this->feuserId}'",
 				array(
 					'deleted' => 0,
 					'accept' => 1
@@ -310,7 +320,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 		if (is_numeric($uID)) {
 			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				'tx_feuserfriends_friends',
-				"uid={$uID} AND user_to={$this->feuserId}",
+				"uid={$uID} AND user_to='{$this->feuserId}'",
 				array(
 					'deleted' => 1,
 					'accept' => 0
@@ -333,7 +343,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 		if (is_numeric($user_id)) {
 			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				'tx_feuserfriends_friends',
-				"(user_from={$user_id} AND user_to={$this->feuserId}) OR (user_from={$this->feuserId} AND user_to={$user_id})",
+				"(user_from='{$user_id}' AND user_to='{$this->feuserId}') OR (user_from='{$this->feuserId}' AND user_to='{$user_id}')",
 				array(
 					'deleted' => 1,
 					'accept' => 0
@@ -416,8 +426,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 		$this->internal['maxPages'] = t3lib_div::intInRange($this->conf[$this->mode]['maxPages'],0,1000,2);               // The maximum number of "pages" in the browse-box: "Page 1", "Page 2", etc.
 		$this->internal['searchFieldList'] = $this->conf['searchFields'];
 		$this->internal['orderByList'] = $this->conf['orderByFields'];
-		if (!$this->conf['neverHideUser'] &&	// user list supression not disabled
-			isset($this->conf['hideUserField'])) {
+		if (!$this->conf['neverHideUser'] && $this->conf['hideUserField']) {
 			$where = "AND NOT ".$this->conf['hideUserField'];
 		}
 		// Show only friends
@@ -725,57 +734,57 @@ class tx_feuserfriends_pi1 extends tslib_pibase {
 	 */
 	function pi_addJS()
 	{
-		$javascript = "
+		$this->addJS("
 var feuser_friends = {
 	dialogToAdd: function(uid) {
-		$('#dialog').remove();
-		$.ajax({
+		jQuery('#dialog').remove();
+		jQuery.ajax({
 			type: 'get',
 			url:  'index.php',
 			data: 'type=500&tx_feuserfriends_pi1[addfriendrequest]='+uid,
 			success: function(html, status) {
-				$('body').append('<div id=\"dialog\">'+html+'</div>');
-				$('#dialog').dialog({
+				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
+				jQuery('#dialog').dialog({
 					buttons: {
-						'".($this->pi_getLL('ok'))."': function() {
-							$.ajax({
+						'".t3lib_div::slashJS($this->pi_getLL('ok'))."': function() {
+							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
-								data: 'type=500&tx_feuserfriends_pi1[addfriendrequest]='+uid+'&tx_feuserfriends_pi1[send]=1'+'&'+$('textarea[name=\"tx_feuserfriends_pi1[invitation]\"]').serialize(),
+								data: 'type=500&tx_feuserfriends_pi1[addfriendrequest]='+uid+'&tx_feuserfriends_pi1[send]=1'+'&'+jQuery('textarea[name=\"tx_feuserfriends_pi1[invitation]\"]').serialize(),
 								success: function(html, status) {
 									if ('{$this->conf['messageTagID']}' == '') {
 										alert(html);
 									} else {
-										$('#".$this->conf['messageTagID']."').html(html);
+										jQuery('#".$this->conf['messageTagID']."').html(html);
 									}
 								}
 							});
-							$(this).dialog('close');
+							jQuery(this).dialog('close');
 						},
-						'".($this->pi_getLL('cancel'))."': function() {
-							$(this).dialog('close');
+						'".t3lib_div::slashJS($this->pi_getLL('cancel'))."': function() {
+							jQuery(this).dialog('close');
 						}
 					},
-					title: '".addslashes($this->pi_getLL('friends_add_title'))."'
+					title: '".t3lib_div::slashJS($this->pi_getLL('friends_add_title'))."'
 				});
 			}
 		});
 	},
 	dialogToRemove: function(uid) {
-		$('#dialog').remove();
-		$.ajax({
+		jQuery('#dialog').remove();
+		jQuery.ajax({
 			type: 'get',
 			url:  'index.php',
 			data: 'type=500&tx_feuserfriends_pi1[removefriend]='+uid,
 			success: function(html, status) {
-				$('body').append('<div id=\"dialog\">'+html+'</div>');
-				$('#dialog').dialog({
+				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
+				jQuery('#dialog').dialog({
 					buttons: {
-						'".($this->pi_getLL('cancel'))."': function() {
-							$(this).dialog('close');
+						'".t3lib_div::slashJS($this->pi_getLL('cancel'))."': function() {
+							jQuery(this).dialog('close');
 						},
-						'".($this->pi_getLL('ok'))."': function() {
-							$.ajax({
+						'".t3lib_div::slashJS($this->pi_getLL('ok'))."': function() {
+							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
 								data: 'type=500&tx_feuserfriends_pi1[removefriend]='+uid+'&tx_feuserfriends_pi1[send]=1',
@@ -783,65 +792,220 @@ var feuser_friends = {
 									if ('{$this->conf['messageTagID']}' == '') {
 										alert(html);
 									} else {
-										$('#".$this->conf['messageTagID']."').html(html);
+										jQuery('#".$this->conf['messageTagID']."').html(html);
 									}
-									$('#friends_'+uid).hide('blind');
+									jQuery('#friends_'+uid).hide('blind');
 								}
 							});
-							$(this).dialog('close');
+							jQuery(this).dialog('close');
 						}
 					},
-					title: '".addslashes($this->pi_getLL('friends_remove_title'))."'
+					title: '".t3lib_div::slashJS($this->pi_getLL('friends_remove_title'))."'
 				});
 			}
 		});
 	},
 	dialogToAccept: function(uid) {
-		$('#dialog').remove();
-		$.ajax({
+		jQuery('#dialog').remove();
+		jQuery.ajax({
 			type: 'get',
 			url:  'index.php',
 			data: 'type=500&tx_feuserfriends_pi1[showfriendrequest]='+uid,
 			success: function(html, status) {
-				$('body').append('<div id=\"dialog\">'+html+'</div>');
-				$('#dialog').dialog({
+				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
+				jQuery('#dialog').dialog({
 					buttons: {
-						'".($this->pi_getLL('friends_request_accept'))."': function() {
-							$.ajax({
+						'".t3lib_div::slashJS($this->pi_getLL('friends_request_accept'))."': function() {
+							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
 								data: 'type=500&tx_feuserfriends_pi1[acceptfriend]='+uid,
 								success: function(html, status) {
-									$('#friendsrequest_link_'+uid).hide('blind');
+									jQuery('#friendsrequest_link_'+uid).hide('blind');
 								}
 							});
-							$(this).dialog('close');
+							jQuery(this).dialog('close');
 						},
-						'".($this->pi_getLL('friends_request_reject'))."': function() {
-							$.ajax({
+						'".t3lib_div::slashJS($this->pi_getLL('friends_request_reject'))."': function() {
+							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
 								data: 'type=500&tx_feuserfriends_pi1[rejectfriend]='+uid,
 								success: function(html, status) {
-									$('#friendsrequest_link_'+uid).hide('blind');
+									jQuery('#friendsrequest_link_'+uid).hide('blind');
 								}
 							});
-							$(this).dialog('close');
+							jQuery(this).dialog('close');
 						}
 					},
-					title: '".addslashes($this->pi_getLL('friends_request_title'))."'
+					title: '".t3lib_div::slashJS($this->pi_getLL('friends_request_title'))."'
 				});
 			}
 		});
 	}
-};
-";
-		$GLOBALS['TSFE']->additionalHeaderData[$this->extKey] = (
-			'<script type="text/javascript" src="' . $TSFE->absRefPrefix . t3lib_extMgm::siteRelPath($this->extKey) . 'res/jquery/js/jquery-1.3.2.min.js" language="JavaScript"></script>' .
-			'<script type="text/javascript" src="' . $TSFE->absRefPrefix . t3lib_extMgm::siteRelPath($this->extKey) . 'res/jquery/js/jquery-ui-1.7.2.custom.min.js" language="JavaScript"></script>' .
-			'<link rel="stylesheet" type="text/css" href="' . $TSFE->absRefPrefix . t3lib_extMgm::siteRelPath($this->extKey) . 'res/jquery/css/custom-theme/jquery-ui-1.7.2.custom.css" />' .
-			TSpagegen::inline2TempFile($javascript, 'js')
-		);
+};");
+	}
+
+	
+	/**
+	 * Include all defined resources (JS / CSS)
+	 *
+	 * @return void
+	 */
+	function addResources()
+	{
+		// checks if t3jquery is loaded
+		if (T3JQUERY === true) {
+			tx_t3jquery::addJqJS();
+		} else {
+			$this->addJsFile($this->conf['jQueryLibrary'], true);
+			$this->addJsFile($this->conf['jQueryEasing']);
+			$this->addJsFile($this->conf['jQueryUI']);
+		}
+		// Fix moveJsFromHeaderToFooter (add all scripts to the footer)
+		if ($GLOBALS['TSFE']->config['config']['moveJsFromHeaderToFooter']) {
+			$allJsInFooter = true;
+		} else {
+			$allJsInFooter = false;
+		}
+		// add all defined JS files
+		if (count($this->jsFiles) > 0) {
+			foreach ($this->jsFiles as $jsToLoad) {
+				if (T3JQUERY === true) {
+					tx_t3jquery::addJS('', array('jsfile' => $jsToLoad));
+				} else {
+					// Add script only once
+					$hash = md5($this->getPath($jsToLoad));
+					if ($allJsInFooter) {
+						$GLOBALS['TSFE']->additionalFooterData['jsFile_'.$this->extKey.'_'.$hash] = ($this->getPath($jsToLoad) ? '<script src="'.$this->getPath($jsToLoad).'" type="text/javascript"></script>'.chr(10) : '');
+					} else {
+						$GLOBALS['TSFE']->additionalHeaderData['jsFile_'.$this->extKey.'_'.$hash] = ($this->getPath($jsToLoad) ? '<script src="'.$this->getPath($jsToLoad).'" type="text/javascript"></script>'.chr(10) : '');
+					}
+				}
+			}
+		}
+		// add all defined JS script
+		if (count($this->js) > 0) {
+			foreach ($this->js as $jsToPut) {
+				$temp_js .= $jsToPut;
+			}
+			if ($this->conf['jsMinify']) {
+				$temp_js = t3lib_div::minifyJavaScript($temp_js);
+			}
+			$conf = array();
+			$conf['jsdata'] = $temp_js;
+			if (T3JQUERY === true && t3lib_div::int_from_ver($this->getExtensionVersion('t3jquery')) >= 1002000) {
+				$conf['tofooter'] = ($this->conf['jsInFooter']);
+				tx_t3jquery::addJS('', $conf);
+			} else {
+				if ($this->conf['jsInFooter'] || $allJsInFooter) {
+					$GLOBALS['TSFE']->additionalFooterData['js_'.$this->extKey] .= t3lib_div::wrapJS($temp_js, true);
+				} else {
+					$GLOBALS['TSFE']->additionalHeaderData['js_'.$this->extKey] .= t3lib_div::wrapJS($temp_js, true);
+				}
+			}
+		}
+		// add all defined CSS files
+		if (count($this->cssFiles) > 0) {
+			foreach ($this->cssFiles as $cssToLoad) {
+				// Add script only once
+				$hash = md5($this->getPath($cssToLoad));
+				$GLOBALS['TSFE']->additionalHeaderData['cssFile_'.$this->extKey.'_'.$hash] = ($this->getPath($cssToLoad) ? '<link rel="stylesheet" href="'.$this->getPath($cssToLoad).'" type="text/css" />'.chr(10) :'');
+			}
+		}
+		// add all defined CSS Script
+		if (count($this->css) > 0) {
+			foreach ($this->css as $cssToPut) {
+				$temp_css .= $cssToPut;
+			}
+			$GLOBALS['TSFE']->additionalHeaderData['css_'.$this->extKey] .= '
+<style type="text/css">
+' . $temp_css . '
+</style>';
+		}
+	}
+
+	/**
+	 * Return the webbased path
+	 * 
+	 * @param string $path
+	 * return string
+	 */
+	function getPath($path="")
+	{
+		return $GLOBALS['TSFE']->tmpl->getFileName($path);
+	}
+
+	/**
+	 * Add additional JS file
+	 * 
+	 * @param string $script
+	 * @param boolean $first
+	 * @return void
+	 */
+	function addJsFile($script="", $first=false)
+	{
+		if ($this->getPath($script) && ! in_array($script, $this->jsFiles)) {
+			if ($first === true) {
+				$this->jsFiles = array_merge(array($script), $this->jsFiles);
+			} else {
+				$this->jsFiles[] = $script;
+			}
+		}
+	}
+
+	/**
+	 * Add JS to header
+	 * 
+	 * @param string $script
+	 * @return void
+	 */
+	function addJS($script="")
+	{
+		if (! in_array($script, $this->js)) {
+			$this->js[] = $script;
+		}
+	}
+
+	/**
+	 * Add additional CSS file
+	 * 
+	 * @param string $script
+	 * @return void
+	 */
+	function addCssFile($script="")
+	{
+		if ($this->getPath($script) && ! in_array($script, $this->cssFiles)) {
+			$this->cssFiles[] = $script;
+		}
+	}
+
+	/**
+	 * Add CSS to header
+	 * 
+	 * @param string $script
+	 * @return void
+	 */
+	function addCSS($script="")
+	{
+		if (! in_array($script, $this->css)) {
+			$this->css[] = $script;
+		}
+	}
+
+	/**
+	 * Returns the version of an extension (in 4.4 its possible to this with t3lib_extMgm::getExtensionVersion)
+	 * @param string $key
+	 * @return string
+	 */
+	function getExtensionVersion($key)
+	{
+		if (! t3lib_extMgm::isLoaded($key)) {
+			return '';
+		}
+		$_EXTKEY = $key;
+		include(t3lib_extMgm::extPath($key) . 'ext_emconf.php');
+		return $EM_CONF[$key]['version'];
 	}
 }
 
