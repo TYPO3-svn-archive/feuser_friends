@@ -67,6 +67,9 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		$this->pi_USER_INT_obj = 1;
 		$this->pi_setPiVarDefaults();
 		$this->pi_loadLL();
+		if (! is_numeric($this->conf['ajaxTypeNum'])) {
+			$this->conf['ajaxTypeNum'] = 500;
+		}
 		$this->internal['currentTable'] = 'fe_users';
 		$GLOBALS["TSFE"]->set_no_cache();
 		// 
@@ -120,6 +123,12 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 				}
 				if ($this->piVars['rejectfriend']) {
 					return $this->rejectFriend($this->piVars['rejectfriend']);
+				}
+				if ($this->piVars['sendmessage']) {
+					return $this->sendMessageView(
+						$this->piVars['sendmessage'],
+						$this->piVars['send']
+					);
 				}
 			} else {
 				// Fallback View
@@ -300,7 +309,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 				"uid={$uID} AND user_to='{$this->feuserId}'",
 				array(
 					'deleted' => 0,
-					'accept' => 1
+					'accept' => 1,
 				)
 			);
 			if ($res) {
@@ -346,7 +355,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 				"(user_from='{$user_id}' AND user_to='{$this->feuserId}') OR (user_from='{$this->feuserId}' AND user_to='{$user_id}')",
 				array(
 					'deleted' => 1,
-					'accept' => 0
+					'accept' => 0,
 				)
 			);
 			if ($res) {
@@ -354,6 +363,49 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * 
+	 * 
+	 */
+	function sendMessageView($user_id, $send=0)
+	{
+		
+		if ($send == 1) {
+			// Insert the new request
+			if (! $this->conf['pidMessage']) {
+				// missconfiguration!
+				return "<p>pidMessage not configured</p>";
+			}
+			// write new record
+			$now = time();
+			$friendsRec = array();
+			$friendsRec['pid']        = intval($this->conf['pidMessage']);
+			$friendsRec['crdate']     = $now;
+			$friendsRec['tstamp']     = $now;
+			$friendsRec['user_from']  = intval($this->feuserId);
+			$friendsRec['user_to']    = intval($uID);
+			$friendsRec['message']    = $this->piVars['message'];
+			$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery(
+				'tx_feuserfriends_message',
+				$friendsRec
+			);
+			if ($res) {
+				$content = sprintf($this->pi_getLL('friends_message_message_ok'), $this->internal['currentRow']['name']);
+				$wrap = $this->conf['messageWrapOk'];
+			} else {
+				$content = sprintf($this->pi_getLL('friends_message_message_error'), $this->internal['currentRow']['name']);
+				$wrap = $this->conf['messageWrapError'];
+			}
+			return $this->cObj->wrap($content, $wrap);
+		} else {
+			$tplCode = $this->cObj->getSubpart($this->templateFile, '###TEMPLATE_MESSAGE_DIALOG###');
+			$markerArray['UID']   = $uID;
+			$markerArray['NAME']  = $this->internal['currentRow']['name'];
+			$markerArray['IMAGE'] = $this->getFieldContent('image');
+			return $this->cObj->substituteMarkerArray($tplCode, $markerArray, '###|###', 0);
+		}
 	}
 
 	/**
@@ -510,7 +562,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 	 * @param $pointer
 	 * @return string
 	 */
-	function pi_list_row($c, $pointer=null, $friends=false)
+	function pi_list_row($c, $pointer=array(), $friends=false)
 	{
 		$markerArray = array();
 		$template = $this->rowTplCode;
@@ -522,7 +574,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			'',
 			$this->internal['currentRow']['uid'],
 			1,
-			$pointer,
+			$this->getPointer($pointer),
 			true,
 			$this->detailId
 		);
@@ -548,20 +600,41 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		$template = $this->cObj->substituteSubpart($template, '###ADD_AS_FRIEND###', $markerContent, 0);
 		// Send Message
 		if ($this->feuserId != $this->internal['currentRow']['uid']) {
+			$markerFriend['VALUE']   = $this->pi_getLL('send_message');
+			$markerFriend['HREF']    = "javascript:void(0);";
+			$markerFriend['ONCLICK'] = "feuser_friends.dialogSendMessage('{$this->internal['currentRow']['uid']}')";
 			$snipet = $this->cObj->getSubpart($this->rowTplCode, '###SEND_MESSAGE###');
-			$link = $this->pi_linkTP($this->pi_getLL('send_message'), array($this->prefixId.'[sendmessage]'=> $this->internal['currentRow']['uid']));
-			$markerContent = $this->cObj->substituteMarker($snipet, '###LINK_TO###', $link);
+			$markerContent = $this->cObj->substituteMarkerArray($snipet, $markerFriend, '###|###', 0);
 		}
 		$template = $this->cObj->substituteSubpart($template, '###SEND_MESSAGE###', $markerContent, 0);
 		// View Profile
 		$snipet = $this->cObj->getSubpart($this->rowTplCode, '###VIEW_PROFILE###');
-		$link = $this->pi_list_linkSingle($this->pi_getLL('view_profile'), $this->internal['currentRow']['uid'], 1, $pointer, false, $this->detailId);
+		$link = $this->pi_list_linkSingle(
+			$this->pi_getLL('view_profile'),
+			$this->internal['currentRow']['uid'],
+			1,
+			$this->getPointer($pointer),
+			false,
+			$this->detailId
+		);
 		$markerContent = $this->cObj->substituteMarker($snipet, '###LINK_TO###', $link);
 		$template = $this->cObj->substituteSubpart($template, '###VIEW_PROFILE###', $markerContent, 0);
 
 		return $this->cObj->substituteMarkerArray($template, $markerArray, '###|###', 0);
 	}
 
+	/**
+	 * Return the pointer for links
+	 * 
+	 */
+	function getPointer($pointer=array())
+	{
+		if (isset($pointer['returnUrl'])) {
+			return $pointer;
+		} else {
+			return array_merge($pointer, array('returnUrl' => t3lib_div::getIndpEnv('REQUEST_URI')));
+		}
+	}
 	/**
 	 * 
 	 * @return string
@@ -603,11 +676,11 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		if ($this->piVars['returnUrl']) {
 			$markerArray['BACK_URL'] = $this->piVars['returnUrl'];
 		} else {
-			$pointer=Array();
+			$pointer = array();
 			if ($this->piVars['pointer']) {
 				$pointer['tx_feuserfriends_pi1[pointer]'] = $this->piVars['pointer'];
 			}
-			$this->pi_linkTP($GLOBALS['TSFE']->id,$pointer);
+			$this->pi_linkTP($GLOBALS['TSFE']->id, $pointer);
 			$markerArray['BACK_URL'] = $this->cObj->lastTypoLinkUrl;
 		}
 		// the language vars
@@ -622,12 +695,17 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 	 * @param $pointer
 	 * @return string
 	 */
-	function getFieldContent($fN, $pointer=null)
+	function getFieldContent($fN, $pointer=array())
 	{
 		$content = '';
 		switch($fN) {
 			case 'uid':
-				$content = $this->pi_list_linkSingle($this->pi_getLL('more', $this->internal['currentRow'][$fN]), $this->internal['currentRow']['uid'], 1, $pointer);
+				$content = $this->pi_list_linkSingle(
+					$this->pi_getLL('more', $this->internal['currentRow'][$fN]),
+					$this->internal['currentRow']['uid'],
+					1,
+					$this->getPointer($pointer)
+				);
 				break;
 			case 'is_online';
 				// time fields
@@ -640,7 +718,14 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			case 'name':
 			case 'username':
 				if ($this->mode == 'listView.' && $this->conf['linkName']) {
-					$content = $this->pi_list_linkSingle($this->internal['currentRow'][$fN], $this->internal['currentRow']['uid'], 1, $pointer, false, $this->detailId);
+					$content = $this->pi_list_linkSingle(
+						$this->internal['currentRow'][$fN],
+						$this->internal['currentRow']['uid'],
+						1,
+						$this->getPointer($pointer),
+						false,
+						$this->detailId
+					);
 				} else {
 					$content = $this->internal['currentRow'][$fN];
 				}
@@ -741,7 +826,7 @@ var feuser_friends = {
 		jQuery.ajax({
 			type: 'get',
 			url:  'index.php',
-			data: 'type=500&tx_feuserfriends_pi1[addfriendrequest]='+uid,
+			data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[addfriendrequest]='+uid,
 			success: function(html, status) {
 				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
 				jQuery('#dialog').dialog({
@@ -750,7 +835,7 @@ var feuser_friends = {
 							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
-								data: 'type=500&tx_feuserfriends_pi1[addfriendrequest]='+uid+'&tx_feuserfriends_pi1[send]=1'+'&'+jQuery('textarea[name=\"tx_feuserfriends_pi1[invitation]\"]').serialize(),
+								data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[addfriendrequest]='+uid+'&tx_feuserfriends_pi1[send]=1'+'&'+jQuery('textarea[name=\"tx_feuserfriends_pi1[invitation]\"]').serialize(),
 								success: function(html, status) {
 									if ('{$this->conf['messageTagID']}' == '') {
 										alert(html);
@@ -775,7 +860,7 @@ var feuser_friends = {
 		jQuery.ajax({
 			type: 'get',
 			url:  'index.php',
-			data: 'type=500&tx_feuserfriends_pi1[removefriend]='+uid,
+			data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[removefriend]='+uid,
 			success: function(html, status) {
 				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
 				jQuery('#dialog').dialog({
@@ -787,7 +872,7 @@ var feuser_friends = {
 							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
-								data: 'type=500&tx_feuserfriends_pi1[removefriend]='+uid+'&tx_feuserfriends_pi1[send]=1',
+								data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[removefriend]='+uid+'&tx_feuserfriends_pi1[send]=1',
 								success: function(html, status) {
 									if ('{$this->conf['messageTagID']}' == '') {
 										alert(html);
@@ -810,7 +895,7 @@ var feuser_friends = {
 		jQuery.ajax({
 			type: 'get',
 			url:  'index.php',
-			data: 'type=500&tx_feuserfriends_pi1[showfriendrequest]='+uid,
+			data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[showfriendrequest]='+uid,
 			success: function(html, status) {
 				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
 				jQuery('#dialog').dialog({
@@ -819,7 +904,7 @@ var feuser_friends = {
 							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
-								data: 'type=500&tx_feuserfriends_pi1[acceptfriend]='+uid,
+								data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[acceptfriend]='+uid,
 								success: function(html, status) {
 									jQuery('#friendsrequest_link_'+uid).hide('blind');
 								}
@@ -830,7 +915,7 @@ var feuser_friends = {
 							jQuery.ajax({
 								type: 'get',
 								url:  'index.php',
-								data: 'type=500&tx_feuserfriends_pi1[rejectfriend]='+uid,
+								data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[rejectfriend]='+uid,
 								success: function(html, status) {
 									jQuery('#friendsrequest_link_'+uid).hide('blind');
 								}
@@ -839,6 +924,40 @@ var feuser_friends = {
 						}
 					},
 					title: '".t3lib_div::slashJS($this->pi_getLL('friends_request_title'))."'
+				});
+			}
+		});
+	},
+	dialogSendMessage: function(uid) {
+		jQuery('#dialog').remove();
+		jQuery.ajax({
+			type: 'get',
+			url:  'index.php',
+			data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[sendmessage]='+uid,
+			success: function(html, status) {
+				jQuery('body').append('<div id=\"dialog\">'+html+'</div>');
+				jQuery('#dialog').dialog({
+					buttons: {
+						'".t3lib_div::slashJS($this->pi_getLL('ok'))."': function() {
+							jQuery.ajax({
+								type: 'get',
+								url:  'index.php',
+								data: 'type={$this->conf['ajaxTypeNum']}&tx_feuserfriends_pi1[sendmessage]='+uid+'&tx_feuserfriends_pi1[send]=1'+'&'+jQuery('textarea[name=\"tx_feuserfriends_pi1[message]\"]').serialize(),
+								success: function(html, status) {
+									if ('{$this->conf['messageTagID']}' == '') {
+										alert(html);
+									} else {
+										jQuery('#".$this->conf['messageTagID']."').html(html);
+									}
+								}
+							});
+							jQuery(this).dialog('close');
+						},
+						'".t3lib_div::slashJS($this->pi_getLL('cancel'))."': function() {
+							jQuery(this).dialog('close');
+						}
+					},
+					title: '".t3lib_div::slashJS($this->pi_getLL('friends_add_title'))."'
 				});
 			}
 		});

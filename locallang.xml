@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
 <T3locallang>
 	<meta type="array">
 		<type>module</type>
@@ -26,6 +26,8 @@
 			<label index="friends_request_title">Friend requests</label>
 			<label index="friends_request_accept">Accept</label>
 			<label index="friends_request_reject">Reject</label>
+			<label index="friends_message_message_ok">Message successfully sent</label>
+			<label index="friends_message_message_error">An Error is occured!</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="list_person">Personen</label>
@@ -48,6 +50,8 @@
 			<label index="friends_request_title">Freundschaftsanfragen</label>
 			<label index="friends_request_accept">Akzeptieren</label>
 			<label index="friends_request_reject">Ablehnen</label>
+			<label index="friends_message_message_ok">Die Mitteilung wurde versendet.</label>
+			<label index="friends_message_message_error">Ein Fehler ist aufgetreten!</label>
 		</languageKey>
 	</data>
 </T3locallang>
