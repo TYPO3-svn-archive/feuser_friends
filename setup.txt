@@ -76,20 +76,21 @@ plugin.tx_feuserfriends_pi1 {
 	# labelWraps.<FIELD> = <STDWRAP>
 }
 
+
 # AJAX Response
-#ajax_response = PAGE
-#ajax_response {
-#  typeNum = {$plugin.tx_feuserfriends_pi1.ajaxTypeNum}
-#  config {
-#    disableAllHeaderCode = 1
-#    xhtml_cleaning = 0
-#    no_cache = 1
-#    admPanel = 0
-#  }
-#  10 < plugin.tx_feuserfriends_pi1
-#  10 {
-#    userFunc = tx_feuserfriends_pi1->main
-#    ajax = 1
-#  }
-#}
+tx_feuserfriends_ajax = PAGE
+tx_feuserfriends_ajax {
+  typeNum = {$plugin.tx_feuserfriends_pi1.ajaxTypeNum}
+  config {
+    disableAllHeaderCode = 1
+    xhtml_cleaning = 0
+    no_cache = 1
+    admPanel = 0
+  }
+  10 < plugin.tx_feuserfriends_pi1
+  10 {
+    userFunc = tx_feuserfriends_pi1->main
+    ajax = 1
+  }
+}
 
