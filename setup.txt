@@ -16,6 +16,9 @@ plugin.tx_feuserfriends_pi1 {
 	# Page ID of friends storage
 	pidFriends = {$plugin.tx_feuserfriends_pi1.pidFriends}
 
+	# Page ID of message storage
+	pidMessage = {$plugin.tx_feuserfriends_pi1.pidMessage}
+
 	# Page ID of detail view
 	detailId = {$plugin.tx_feuserfriends_pi1.detailId}
 

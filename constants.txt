@@ -28,45 +28,48 @@ plugin.tx_feuserfriends_pi1 {
 
 
 
-	# cat=plugin.feuser_friends//010; type=int+; label=PID of FE user storage folder: If empty "Starting point" or current folder are used.
+	# cat=plugin.feuser_friends/basic/010; type=int+; label=PID of FE user storage folder: If empty "Starting point" or current folder are used.
 	pidList =
 
-	# cat=plugin.feuser_friends//020; type=int+; label=PID of friends storage
+	# cat=plugin.feuser_friends/basic/020; type=int+; label=PID of friends storage
 	pidFriends =
 
-	# cat=plugin.feuser_friends//030; type=int+; label=UID for detailed view: The ID of the page where the FE-user detail is shown.
+	# cat=plugin.feuser_friends/basic/030; type=int+; label=PID of message storage
+	pidMessage = 
+
+	# cat=plugin.feuser_friends/basic/040; type=int+; label=PID for detailed view: The ID of the page where the FE-user detail is shown.
 	detailId =
 
-	# cat=plugin.feuser_friends//040; type=int+; label=FE user Recursion depth: Depth for FE user storage folder recursion - empty or 0 means no recursion.
+	# cat=plugin.feuser_friends/basic/050; type=int+; label=FE user Recursion depth: Depth for FE user storage folder recursion - empty or 0 means no recursion.
 	recursive = 0
 
-	# cat=plugin.feuser_friends//050; type=string; label=Link fields: Fields that contain links or typolinks (eg homepage and email address).
+	# cat=plugin.feuser_friends/basic/060; type=string; label=Link fields: Fields that contain links or typolinks (eg homepage and email address).
 	linkFields = email,www
 
-	# cat=plugin.feuser_friends//060; type=string; label=Image fields: Fields that contain images.
+	# cat=plugin.feuser_friends/basic/070; type=string; label=Image fields: Fields that contain images.
 	imageFields = image
 
-	# cat=plugin.feuser_friends//070; type=string; label='Show email' field: Name of a field that enables the display of email addresses for a single user. Any content that evaluates as 'true' will make the email address appear. Otherwise the output is suppressed for the privacy of this user.
+	# cat=plugin.feuser_friends/basic/080; type=string; label='Show email' field: Name of a field that enables the display of email addresses for a single user. Any content that evaluates as 'true' will make the email address appear. Otherwise the output is suppressed for the privacy of this user.
 	showEmailField =
 
-	# cat=plugin.feuser_friends//080; type=boolean; label=Override the 'show email' field: If you use this feature the email addresses are disclosed regardless of the user settings. This may be used to honour the preferences when showing profiles to non-members, but will allow members to see addresses of other members.
+	# cat=plugin.feuser_friends/basic/090; type=boolean; label=Override the 'show email' field: If you use this feature the email addresses are disclosed regardless of the user settings. This may be used to honour the preferences when showing profiles to non-members, but will allow members to see addresses of other members.
 	alwaysShowEmail = 0
 
-	# cat=plugin.feuser_friends//090; type=string; label='Hide user' field: Name of a field that disables the listing of a single user. Any content that evaluates as 'true' will make the user disappear. Otherwise the user is display normally.
+	# cat=plugin.feuser_friends/basic/100; type=string; label='Hide user' field: Name of a field that disables the listing of a single user. Any content that evaluates as 'true' will make the user disappear. Otherwise the user is display normally.
 	hideUserField = 
 
-	# cat=plugin.feuser_friends//100; type=boolean; label=Override the 'hide user' field: If you use this feature the users are always listed. This may be used to honour the preferences when showing profiles to non-members, but will allow members to see addresses of other members.
+	# cat=plugin.feuser_friends/basic/110; type=boolean; label=Override the 'hide user' field: If you use this feature the users are always listed. This may be used to honour the preferences when showing profiles to non-members, but will allow members to see addresses of other members.
 	neverHideUser = 0
 
-	# cat=plugin.feuser_friends//110; type=int+; label=Page typoNum for AJAX
+	# cat=plugin.feuser_friends/basic/120; type=int+; label=Page typoNum for AJAX
 	ajaxTypeNum = 500
 
-	# cat=plugin.feuser_friends//120; type=string; label=Wrap for error messages
+	# cat=plugin.feuser_friends/basic/130; type=string; label=Wrap for error messages
 	messageWrapError = <div class="error">|</div>
 
-	# cat=plugin.feuser_friends//130; type=string; label=Wrap for ok messages
+	# cat=plugin.feuser_friends/basic/140; type=string; label=Wrap for ok messages
 	messageWrapOk = <div class="ok">|</div>
 
-	# cat=plugin.feuser_friends//140; type=int+; label=html tag id to show messages
+	# cat=plugin.feuser_friends/basic/150; type=int+; label=html tag id to show messages
 	messageTagID = friendsrequest_message
 }
