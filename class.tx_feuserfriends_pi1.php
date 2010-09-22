@@ -100,6 +100,9 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		} elseif ($this->cObj->data['tx_feuserfriends_view'] == 3) {
 			// friends view (list)
 			$content = $this->listView(true);
+		} elseif ($this->cObj->data['tx_feuserfriends_view'] == 4) {
+			// message view (list)
+			$content = $this->messageView();
 		} else {
 			if ($this->conf['ajax']) {
 				// AJAX
@@ -385,7 +388,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			$friendsRec['crdate']     = $now;
 			$friendsRec['tstamp']     = $now;
 			$friendsRec['user_from']  = intval($this->feuserId);
-			$friendsRec['user_to']    = intval($uID);
+			$friendsRec['user_to']    = intval($user_id);
 			$friendsRec['message']    = $this->piVars['message'];
 			$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery(
 				'tx_feuserfriends_message',
@@ -401,7 +404,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			return $this->cObj->wrap($content, $wrap);
 		} else {
 			$tplCode = $this->cObj->getSubpart($this->templateFile, '###TEMPLATE_MESSAGE_DIALOG###');
-			$markerArray['UID']   = $uID;
+			$markerArray['UID']   = $user_id;
 			$markerArray['NAME']  = $this->internal['currentRow']['name'];
 			$markerArray['IMAGE'] = $this->getFieldContent('image');
 			return $this->cObj->substituteMarkerArray($tplCode, $markerArray, '###|###', 0);
@@ -420,6 +423,8 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 	{
 		$this->mode = 'friendsRequestView.';
 		$markerArray = array();
+		$old_pid_list = $this->conf['pidList'];
+		$this->conf['pidList'] = ($this->cObj->data['pages'] ? $this->cObj->data['pages'] : $this->conf['pidFriends']);
 		$where = "
 		AND user_to='{$this->feuserId}'
 		AND NOT accept";
@@ -432,6 +437,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			'crdate DESC'
 		);
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$this->conf['pidList'] = $old_pid_list;
 		$rowContent = '';
 		$tplCode = $this->cObj->getSubpart($this->templateFile, '###TEMPLATE_FRIENDS_REQUEST_LIST###');
 		$tplRow = $this->cObj->getSubpart($tplCode, '###ROW###');
@@ -455,6 +461,49 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		$tplCode = $this->cObj->substituteSubpart($tplCode, '###ROW###', $rowContent, 0);
 		// the language vars
 		$markerArray['TITLE'] = $this->pi_getLL('friends_request_title');
+
+		return $this->cObj->substituteMarkerArray($tplCode, $markerArray, '###|###', 0);
+	}
+
+	/**
+	 * 
+	 */
+	function messageView()
+	{
+		$this->mode = 'messageView.';
+		$markerArray = array();
+		$old_pid_list = $this->conf['pidList'];
+		$this->conf['pidList'] = ($this->cObj->data['pages'] ? $this->cObj->data['pages'] : $this->conf['pidMessage']);
+		$where = "AND user_to='{$this->feuserId}'";
+		$query = $this->pi_list_query(
+			'tx_feuserfriends_message',
+			0,
+			$where,
+			'',
+			'',
+			'crdate DESC'
+		);
+		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$this->conf['pidList'] = $old_pid_list;
+		$tplCode = $this->cObj->getSubpart($this->templateFile, '###TEMPLATE_MESSAGE_LIST###');
+		$tplRow = $this->cObj->getSubpart($tplCode, '###ROW###');
+		$rowContent = '';
+		while($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
+			// get the Information of the User who send the message
+			$user_from = $this->pi_getRecord(
+				'fe_users',
+				$row['user_from']
+			);
+			$rowArray = array();
+			$rowArray['USER_FROM'] = $user_from['name'];
+			$rowArray['MESSAGE']   = $row['message'];
+			$rowContent .= $this->cObj->substituteMarkerArray($tplRow, $rowArray, '###|###', 0);
+		}
+		$GLOBALS['TYPO3_DB']->sql_free_result($res);
+		if ($rowContent == '') {
+			return '';
+		}
+		$tplCode = $this->cObj->substituteSubpart($tplCode, '###ROW###', $rowContent, 0);
 
 		return $this->cObj->substituteMarkerArray($tplCode, $markerArray, '###|###', 0);
 	}
