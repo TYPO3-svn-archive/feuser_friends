@@ -12,7 +12,7 @@ plugin.tx_feuserfriends_pi1 {
 	# default poroperty of piBase
 	pidList.field = pages
 	pidList.ifEmpty = {$plugin.tx_feuserfriends_pi1.pidList}
-  
+
 	# Page ID of friends storage
 	pidFriends = {$plugin.tx_feuserfriends_pi1.pidFriends}
 
@@ -83,17 +83,17 @@ plugin.tx_feuserfriends_pi1 {
 # AJAX Response
 tx_feuserfriends_ajax = PAGE
 tx_feuserfriends_ajax {
-  typeNum = {$plugin.tx_feuserfriends_pi1.ajaxTypeNum}
-  config {
-    disableAllHeaderCode = 1
-    xhtml_cleaning = 0
-    no_cache = 1
-    admPanel = 0
-  }
-  10 < plugin.tx_feuserfriends_pi1
-  10 {
-    userFunc = tx_feuserfriends_pi1->main
-    ajax = 1
-  }
+	typeNum = {$plugin.tx_feuserfriends_pi1.ajaxTypeNum}
+	config {
+		disableAllHeaderCode = 1
+		xhtml_cleaning = 0
+		no_cache = 1
+		admPanel = 0
+	}
+	10 < plugin.tx_feuserfriends_pi1
+	10 {
+		userFunc = tx_feuserfriends_pi1->main
+		ajax = 1
+	}
 }
 
