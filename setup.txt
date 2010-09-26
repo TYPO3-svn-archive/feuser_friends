@@ -2,6 +2,8 @@ plugin.tx_feuserfriends_pi1 {
 	jQueryNoConflict = {$plugin.tx_feuserfriends_pi1.jQueryNoConflict}
 	jsInFooter = {$plugin.tx_feuserfriends_pi1.jsInFooter}
 	jsMinify = {$plugin.tx_feuserfriends_pi1.jsMinify}
+	jsInline = {$plugin.tx_feuserfriends_pi1.jsInline}
+	cssMinify = {$plugin.tx_feuserfriends_pi1.cssMinify}
 
 	templateFile = {$plugin.tx_feuserfriends_pi1.file.templateFile}
 	jQueryLibrary = {$plugin.tx_feuserfriends_pi1.file.jQueryLibrary}
