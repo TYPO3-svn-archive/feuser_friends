@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for plugin &quot;tx_feuserfriends_pi1&quot;</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="list_person">Person</label>
+			<label index="list_username">Username:</label>
+			<label index="list_name">Name:</label>
+			<label index="add_as_friend">Add as friend</label>
+			<label index="remove_friend">Remove Friend</label>
+			<label index="send_message">Send Message</label>
+			<label index="view_profile">View Profile</label>
+			<label index="back_text">Back</label>
+			<label index="ok">OK</label>
+			<label index="cancel">Cancel</label>
+			<label index="friends_remove_title">Remove friend</label>
+			<label index="friend_remove_message_ok">You removed your friend %s</label>
+			<label index="friend_remove_message_error">An Error is occured!</label>
+			<label index="friends_add_title">Friend request</label>
+			<label index="friends_add_message_ok">You have invited %s as friend</label>
+			<label index="friends_add_message_already">You are already a friend with %s</label>
+			<label index="friends_add_message_error">An Error is occured!</label>
+			<label index="friends_request_title">Friend requests</label>
+			<label index="friends_request_accept">Accept</label>
+			<label index="friends_request_reject">Reject</label>
+			<label index="friends_message_message_ok">Message successfully sent</label>
+			<label index="friends_message_message_error">An Error is occured!</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="list_person">Personen</label>
+			<label index="list_username">Benutzername:</label>
+			<label index="list_name">Name:</label>
+			<label index="add_as_friend">Als FreundIn hinzufügen</label>
+			<label index="remove_friend">Freund entfernen</label>
+			<label index="send_message">Nachricht senden</label>
+			<label index="view_profile">Profile ansehen</label>
+			<label index="back_text">Zurück</label>
+			<label index="ok">OK</label>
+			<label index="cancel">Abbrechen</label>
+			<label index="friends_remove_title">Freund entfernen</label>
+			<label index="friend_remove_message_ok">Du hast deinen Freund %s entfernt</label>
+			<label index="friend_remove_message_error">Ein Fehler ist aufgetreten!</label>
+			<label index="friends_add_title">Als Freund hinzufügen</label>
+			<label index="friends_add_message_ok">Du hast den Benutzer %s als Freund eingeladen</label>
+			<label index="friends_add_message_already">Du bist bereits mit %s befreundet</label>
+			<label index="friends_add_message_error">Ein Fehler ist aufgetreten!</label>
+			<label index="friends_request_title">Freundschaftsanfragen</label>
+			<label index="friends_request_accept">Akzeptieren</label>
+			<label index="friends_request_reject">Ablehnen</label>
+			<label index="friends_message_message_ok">Die Mitteilung wurde versendet.</label>
+			<label index="friends_message_message_error">Ein Fehler ist aufgetreten!</label>
+		</languageKey>
+	</data>
+</T3locallang>
