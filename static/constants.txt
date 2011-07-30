@@ -18,19 +18,19 @@ plugin.tx_feuserfriends_pi1 {
 
 
 	# cat=plugin.feuser_friends/file/010; type=file[html,htm,tmpl,txt]; label= Template File: HTML-template file
-	file.templateFile = EXT:feuser_friends/pi1/feuser_friends.tmpl
+	file.templateFile = EXT:feuser_friends/res/feuser_friends.tmpl
 
 	# cat=plugin.feuser_friends/file/020; type=file[js]; label=jQuery Library: Location of the jQuery Lib
-	file.jQueryLibrary = EXT:feuser_friends/res/jquery/js/jquery-1.5.1.min.js
+	file.jQueryLibrary = EXT:feuser_friends/res/jquery/js/jquery-1.6.2.min.js
 
 	# cat=plugin.feuser_friends/file/030; type=file[js]; label=jQuery Easing: Location of the jQuery Easing
 	file.jQueryEasing = EXT:feuser_friends/res/jquery/js/jquery.easing-1.3.js
 
 	# cat=plugin.feuser_friends/file/040; type=file[js]; label=jQuery UI: Location of the jQuery UI
-	file.jQueryUI = EXT:feuser_friends/res/jquery/js/jquery-ui-1.8.4.custom.min.js
+	file.jQueryUI = EXT:feuser_friends/res/jquery/js/jquery-ui-1.8.14.custom.min.js
 
 	# cat=plugin.feuser_friends/file/050; type=file[css]; label=jQuery UI style: Location of the jQuery UI CSS
-	file.jQueryUIstyle = EXT:feuser_friends/res/jquery/css/theme-1.8/jquery-ui-1.8.4.custom.css
+	file.jQueryUIstyle = EXT:feuser_friends/res/jquery/css/theme-1.8.13/jquery-ui-1.8.13.custom.css
 
 
 
