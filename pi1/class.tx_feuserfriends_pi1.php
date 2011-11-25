@@ -527,6 +527,14 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		$this->internal['maxPages'] = t3lib_div::intInRange($this->conf[$this->mode]['maxPages'],0,1000,2);               // The maximum number of "pages" in the browse-box: "Page 1", "Page 2", etc.
 		$this->internal['searchFieldList'] = $this->conf['searchFields'];
 		$this->internal['orderByList'] = $this->conf['orderByFields'];
+		// Should the 'First' and 'Last' be shown in the browse-box
+		$this->internal['showFirstLast'] = t3lib_div::intInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
+		// Should the current page be a link
+		$this->internal['dontLinkActivePage'] = t3lib_div::intInRange($this->conf[$this->mode]['dontLinkActivePage'], 0, 1, 0);
+		if ($this->conf[$this->mode]['pagefloat']) {
+			// Where in the list is the current page shown. The value 'center' puts it in the middle.
+			$this->internal['pagefloat'] = $this->conf[$this->mode]['pagefloat'];
+		}
 		if (!$this->conf['neverHideUser'] && $this->conf['hideUserField']) {
 			$where = "AND NOT ".$this->conf['hideUserField'];
 		}
@@ -538,12 +546,20 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			}
 			$where .= " AND uid IN (".implode(',', $friends_array).")";
 		}
+		$userGroupsToShow = t3lib_div::intExplode(',', $this->conf['userGroupToShow']);
+		if (count($userGroupsToShow) > 0) {
+			$groupWhere = array();
+			foreach ($userGroupsToShow as $userGroupToShow) {
+				$groupWhere[] = " CONCAT(',', usergroup, ',') LIKE '%,$userGroupToShow,%'";
+			}
+			$where .= " AND (".implode(" OR ", $groupWhere).")";
+		}
 		// Get number of records:
 		$query = $this->pi_list_query($this->internal['currentTable'], 1, $where);
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		list($this->internal['res_count']) = $GLOBALS['TYPO3_DB']->sql_fetch_row($res);
 		// Make listing query, pass query to MySQL:
-		$query = $this->pi_list_query($this->internal['currentTable'], 0, $where);
+		$query = $this->pi_list_query($this->internal['currentTable'], 0, $where, '', '', $this->conf['orderByFields']);
 		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		// Adds the search box:
 		$markerArray['SEARCH'] = $this->pi_list_searchBox();
@@ -668,6 +684,13 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		);
 		$markerContent = $this->cObj->substituteMarker($snipet, '###LINK_TO###', $link);
 		$template = $this->cObj->substituteSubpart($template, '###VIEW_PROFILE###', $markerContent, 0);
+		// Hook for any additional handling of listView fields
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$this->extKey]['listViewPreSubstitute'])) {
+			foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$this->extKey]['listViewPreSubstitute'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->listViewPreSubstitute($this, $markerArray, $template);
+			}
+		}
 
 		return $this->cObj->substituteMarkerArray($template, $markerArray, '###|###', 0);
 	}
@@ -734,6 +757,13 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		}
 		// the language vars
 		$markerArray['BACK_TEXT'] = $this->pi_getLL('back_text');
+		// Hook for any additional handling of singleView fields
+		if (is_array($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$this->extKey]['singleViewPreSubstitute'])) {
+			foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF'][$this->extKey]['singleViewPreSubstitute'] as $_classRef) {
+				$_procObj = & t3lib_div::getUserObj($_classRef);
+				$_procObj->singleViewPreSubstitute($this, $markerArray, $tplCode);
+			}
+		}
 
 		return $this->cObj->substituteMarkerArray($tplCode, $markerArray, '###|###', 0, true);
 	}

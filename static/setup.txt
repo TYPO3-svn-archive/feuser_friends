@@ -42,6 +42,8 @@ plugin.tx_feuserfriends_pi1 {
 	alwaysShowEmail = {$plugin.tx_feuserfriends_pi1.alwaysShowEmail}
 	neverHideUser = {$plugin.tx_feuserfriends_pi1.neverHideUser}
 
+	userGroupToShow = {$plugin.tx_feuserfriends_pi1.userGroupToShow}
+
 	# Views can be defined like this:
 	# <VIEW>.fields = <FIELDS_TO_SHOW>
 	# <VIEW>.fieldWraps.<FIELD> = <STDWRAP>
