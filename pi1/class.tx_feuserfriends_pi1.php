@@ -428,7 +428,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		$where = "
 		AND user_to='{$this->feuserId}'
 		AND NOT accept";
-		$query = $this->pi_list_query(
+		$res = $this->pi_exec_query(
 			'tx_feuserfriends_friends',
 			0,
 			$where,
@@ -436,7 +436,6 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			'',
 			'crdate DESC'
 		);
-		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		$this->conf['pidList'] = $old_pid_list;
 		$rowContent = '';
 		$tplCode = $this->cObj->getSubpart($this->templateFile, '###TEMPLATE_FRIENDS_REQUEST_LIST###');
@@ -475,7 +474,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		$old_pid_list = $this->conf['pidList'];
 		$this->conf['pidList'] = ($this->cObj->data['pages'] ? $this->cObj->data['pages'] : $this->conf['pidMessage']);
 		$where = "AND user_to='{$this->feuserId}'";
-		$query = $this->pi_list_query(
+		$res = $this->pi_exec_query(
 			'tx_feuserfriends_message',
 			0,
 			$where,
@@ -483,7 +482,6 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			'',
 			'crdate DESC'
 		);
-		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
 		$this->conf['pidList'] = $old_pid_list;
 		$tplCode = $this->cObj->getSubpart($this->templateFile, '###TEMPLATE_MESSAGE_LIST###');
 		$tplRow = $this->cObj->getSubpart($tplCode, '###ROW###');
@@ -523,14 +521,14 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		}
 		// Initializing the query parameters:
 		list($this->internal['orderBy'], $this->internal['descFlag']) = explode(':',$this->piVars['sort']);
-		$this->internal['results_at_a_time'] = t3lib_div::intInRange($this->conf[$this->mode]['itemsPerPage'],0,1000,10); // Number of results to show in a listing.
-		$this->internal['maxPages'] = t3lib_div::intInRange($this->conf[$this->mode]['maxPages'],0,1000,2);               // The maximum number of "pages" in the browse-box: "Page 1", "Page 2", etc.
+		$this->internal['results_at_a_time'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['itemsPerPage'],0,1000,10); // Number of results to show in a listing.
+		$this->internal['maxPages'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['maxPages'],0,1000,2); // The maximum number of "pages" in the browse-box: "Page 1", "Page 2", etc.
 		$this->internal['searchFieldList'] = $this->conf['searchFields'];
 		$this->internal['orderByList'] = $this->conf['orderByFields'];
 		// Should the 'First' and 'Last' be shown in the browse-box
-		$this->internal['showFirstLast'] = t3lib_div::intInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
+		$this->internal['showFirstLast'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
 		// Should the current page be a link
-		$this->internal['dontLinkActivePage'] = t3lib_div::intInRange($this->conf[$this->mode]['dontLinkActivePage'], 0, 1, 0);
+		$this->internal['dontLinkActivePage'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['dontLinkActivePage'], 0, 1, 0);
 		if ($this->conf[$this->mode]['pagefloat']) {
 			// Where in the list is the current page shown. The value 'center' puts it in the middle.
 			$this->internal['pagefloat'] = $this->conf[$this->mode]['pagefloat'];
@@ -546,7 +544,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			}
 			$where .= " AND uid IN (".implode(',', $friends_array).")";
 		}
-		$userGroupsToShow = t3lib_div::intExplode(',', $this->conf['userGroupToShow']);
+		$userGroupsToShow = t3lib_div::intExplode(',', $this->conf['userGroupToShow'], TRUE);
 		if (count($userGroupsToShow) > 0) {
 			$groupWhere = array();
 			foreach ($userGroupsToShow as $userGroupToShow) {
@@ -555,12 +553,10 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 			$where .= " AND (".implode(" OR ", $groupWhere).")";
 		}
 		// Get number of records:
-		$query = $this->pi_list_query($this->internal['currentTable'], 1, $where);
-		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$res = $this->pi_exec_query($this->internal['currentTable'], 1, $where);
 		list($this->internal['res_count']) = $GLOBALS['TYPO3_DB']->sql_fetch_row($res);
 		// Make listing query, pass query to MySQL:
-		$query = $this->pi_list_query($this->internal['currentTable'], 0, $where, '', '', $this->conf['orderByFields']);
-		$res = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$res = $this->pi_exec_query($this->internal['currentTable'], 0, $where, '', '', $this->conf['orderByFields']);
 		// Adds the search box:
 		$markerArray['SEARCH'] = $this->pi_list_searchBox();
 		// Adds the result browser:
