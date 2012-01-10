@@ -521,14 +521,19 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		}
 		// Initializing the query parameters:
 		list($this->internal['orderBy'], $this->internal['descFlag']) = explode(':',$this->piVars['sort']);
-		$this->internal['results_at_a_time'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['itemsPerPage'],0,1000,10); // Number of results to show in a listing.
-		$this->internal['maxPages'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['maxPages'],0,1000,2); // The maximum number of "pages" in the browse-box: "Page 1", "Page 2", etc.
+		if (t3lib_div::int_from_ver(TYPO3_version) >= 4006000) {
+			$this->internal['results_at_a_time']  = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['itemsPerPage'], 0, 1000, 10);
+			$this->internal['maxPages']           = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['maxPages'], 0, 1000, 2);
+			$this->internal['showFirstLast']      = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
+			$this->internal['dontLinkActivePage'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['dontLinkActivePage'], 0, 1, 0);
+		} else {
+			$this->internal['results_at_a_time']  = t3lib_div::intInRange($this->conf[$this->mode]['itemsPerPage'], 0, 1000, 10);
+			$this->internal['maxPages']           = t3lib_div::intInRange($this->conf[$this->mode]['maxPages'], 0, 1000, 2);
+			$this->internal['showFirstLast']      = t3lib_div::intInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
+			$this->internal['dontLinkActivePage'] = t3lib_div::intInRange($this->conf[$this->mode]['dontLinkActivePage'], 0, 1, 0);
+		}
 		$this->internal['searchFieldList'] = $this->conf['searchFields'];
 		$this->internal['orderByList'] = $this->conf['orderByFields'];
-		// Should the 'First' and 'Last' be shown in the browse-box
-		$this->internal['showFirstLast'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
-		// Should the current page be a link
-		$this->internal['dontLinkActivePage'] = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['dontLinkActivePage'], 0, 1, 0);
 		if ($this->conf[$this->mode]['pagefloat']) {
 			// Where in the list is the current page shown. The value 'center' puts it in the middle.
 			$this->internal['pagefloat'] = $this->conf[$this->mode]['pagefloat'];
