@@ -36,6 +36,7 @@ plugin.tx_feuserfriends_pi1 {
 
 	linkFields = {$plugin.tx_feuserfriends_pi1.linkFields}
 	imageFields = {$plugin.tx_feuserfriends_pi1.imageFields}
+	rteFields = {$plugin.tx_feuserfriends_pi1.rteFields}
 	showEmailField = {$plugin.tx_feuserfriends_pi1.showEmailField}
 	hideUserField = {$plugin.tx_feuserfriends_pi1.hideUserField}
 
@@ -43,6 +44,9 @@ plugin.tx_feuserfriends_pi1 {
 	neverHideUser = {$plugin.tx_feuserfriends_pi1.neverHideUser}
 
 	userGroupToShow = {$plugin.tx_feuserfriends_pi1.userGroupToShow}
+
+	# Define the folder of the imagefield
+	# imgDirs.<field> = uploads/tx_ext
 
 	# Views can be defined like this:
 	# <VIEW>.fields = <FIELDS_TO_SHOW>
