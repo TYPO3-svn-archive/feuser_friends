@@ -540,7 +540,7 @@ class tx_feuserfriends_pi1 extends tslib_pibase
 		}
 		// Initializing the query parameters:
 		list($this->internal['orderBy'], $this->internal['descFlag']) = explode(':',$this->piVars['sort']);
-		if (t3lib_div::int_from_ver(TYPO3_version) >= 4006000) {
+		if (t3lib_utility_VersionNumber::convertVersionNumberToInteger(TYPO3_version) >= 4006000) {
 			$this->internal['results_at_a_time']  = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['itemsPerPage'], 0, 1000, 10);
 			$this->internal['maxPages']           = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['maxPages'], 0, 1000, 2);
 			$this->internal['showFirstLast']      = t3lib_utility_Math::forceIntegerInRange($this->conf[$this->mode]['showFirstLast'], 0, 1, 0);
