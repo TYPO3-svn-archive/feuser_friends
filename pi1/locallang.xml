@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <T3locallang>
 	<meta type="array">
 		<type>module</type>
@@ -39,17 +39,17 @@
 			<label index="list_person">Personen</label>
 			<label index="list_username">Benutzername:</label>
 			<label index="list_name">Name:</label>
-			<label index="add_as_friend">Als FreundIn hinzufügen</label>
+			<label index="add_as_friend">Als FreundIn hinzufÃ¼gen</label>
 			<label index="remove_friend">Freund entfernen</label>
 			<label index="send_message">Nachricht senden</label>
 			<label index="view_profile">Profile ansehen</label>
-			<label index="back_text">Zurück</label>
+			<label index="back_text">ZurÃ¼ck</label>
 			<label index="ok">OK</label>
 			<label index="cancel">Abbrechen</label>
 			<label index="friends_remove_title">Freund entfernen</label>
 			<label index="friend_remove_message_ok">Du hast deinen Freund %s entfernt</label>
 			<label index="friend_remove_message_error">Ein Fehler ist aufgetreten!</label>
-			<label index="friends_add_title">Als Freund hinzufügen</label>
+			<label index="friends_add_title">Als Freund hinzufÃ¼gen</label>
 			<label index="friends_add_message_ok">Du hast den Benutzer %s als Freund eingeladen</label>
 			<label index="friends_add_message_already">Du bist bereits mit %s befreundet</label>
 			<label index="friends_add_message_error">Ein Fehler ist aufgetreten!</label>
@@ -59,7 +59,7 @@
 			<label index="friends_message_message_ok">Die Mitteilung wurde versendet.</label>
 			<label index="friends_message_message_error">Ein Fehler ist aufgetreten!</label>
 			<label index="pi_list_browseresults_first">&lt;&lt; Erster</label>
-			<label index="pi_list_browseresults_prev">&lt; Zur�ck</label>
+			<label index="pi_list_browseresults_prev">&lt; Zurück</label>
 			<label index="pi_list_browseresults_page">Seite</label>
 			<label index="pi_list_browseresults_next">Weiter &gt;</label>
 			<label index="pi_list_browseresults_last">Letzte &gt;&gt;</label>
@@ -69,7 +69,7 @@
 			<label index="list_person">Person</label>
 			<label index="list_username">Brugernavn</label>
 			<label index="list_name">Navn</label>
-			<label index="add_as_friend">Tilf�j som ven</label>
+			<label index="add_as_friend">Tilføj som ven</label>
 			<label index="remove_friend">Fjern ven</label>
 			<label index="send_message">Send besked</label>
 			<label index="view_profile">Vis profil</label>
@@ -79,19 +79,19 @@
 			<label index="friends_remove_title">Fjern ven</label>
 			<label index="friend_remove_message_ok">Du har fjernet %s som ven</label>
 			<label index="friend_remove_message_error">Der opstod en fejl!</label>
-			<label index="friends_add_title">Venne-forsp�rgsel</label>
+			<label index="friends_add_title">Venne-forspørgsel</label>
 			<label index="friends_add_message_ok">Du har inviteret %s som ven</label>
 			<label index="friends_add_message_already">Du er allerede ven med %s</label>
 			<label index="friends_add_message_error">Der opstod en fejl!</label>
-			<label index="friends_request_title">Venne-forsp�rgsel</label>
+			<label index="friends_request_title">Venne-forspørgsel</label>
 			<label index="friends_request_accept">Accepter</label>
-			<label index="friends_request_reject">Afsl�</label>
+			<label index="friends_request_reject">Afslå</label>
 			<label index="friends_message_message_ok">Beskeden er sendt</label>
 			<label index="friends_message_message_error">Der opstod en fejl!</label>
-			<label index="pi_list_browseresults_first">&lt;&lt; F�rste</label>
+			<label index="pi_list_browseresults_first">&lt;&lt; Første</label>
 			<label index="pi_list_browseresults_prev">&lt;Forrige</label>
 			<label index="pi_list_browseresults_page">Side</label>
-			<label index="pi_list_browseresults_next">N�ste &gt;</label>
+			<label index="pi_list_browseresults_next">Næste &gt;</label>
 			<label index="pi_list_browseresults_last">Sidste &gt;&gt;</label>
    			<label index="pi_list_browseresults_displays">Viser fra %s til %s ud af %s</label> 
 		</languageKey>
