@@ -43,15 +43,16 @@ class tx_feuserfriends_pi1_wizicon
 	 * @param	array		$wizardItems: The wizard items
 	 * @return	Modified array with wizard items
 	 */
-	function proc($wizardItems)	{
-		global $LANG;
+	function proc($wizardItems)
+	{
 		$LL = $this->includeLocalLang();
 		$wizardItems['plugins_tx_feuserfriends_pi1'] = array(
-			'icon'=>t3lib_extMgm::extRelPath('feuser_friends').'pi1/ce_wiz.gif',
-			'title'=>$LANG->getLLL('pi1_title',$LL),
-			'description'=>$LANG->getLLL('pi1_plus_wiz_description',$LL),
-			'params'=>'&defVals[tt_content][CType]=list&defVals[tt_content][list_type]=feuser_friends_pi1'
+			'icon' => t3lib_extMgm::extRelPath('feuser_friends').'pi1/ce_wiz.gif',
+			'title' => $GLOBALS['LANG']->getLLL('pi1_title',$LL),
+			'description' => $GLOBALS['LANG']->getLLL('pi1_plus_wiz_description',$LL),
+			'params' => '&defVals[tt_content][CType]=list&defVals[tt_content][list_type]=feuser_friends_pi1'
 		);
+
 		return $wizardItems;
 	}
 
@@ -60,9 +61,15 @@ class tx_feuserfriends_pi1_wizicon
 	 *
 	 * @return	The array with language labels
 	 */
-	function includeLocalLang()	{
+	function includeLocalLang()
+	{
 		$llFile = t3lib_extMgm::extPath('feuser_friends').'locallang.xml';
-		$LOCAL_LANG = t3lib_div::readLLXMLfile($llFile, $GLOBALS['LANG']->lang);
+		if (class_exists(t3lib_l10n_parser_Llxml)) {
+			$LOCAL_LANG = t3lib_l10n_parser_Llxml::getParsedData($llFile, $GLOBALS['LANG']->lang);
+		} else {
+			$LOCAL_LANG = t3lib_div::readLLXMLfile($llFile, $GLOBALS['LANG']->lang);
+		}
+
 		return $LOCAL_LANG;
 	}
 }
